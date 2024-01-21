@@ -214,6 +214,49 @@ def prereqremove():
     print(ret)
     return jsonify(ret) # could also include info to be displayed for newly added course
 
+@plan.route("getinfo", methods = ["POST", "OPTIONS"])
+def getinfo():
+    # handle OPTIONS cleanly
+    if request.method == "OPTIONS":
+        response = make_response()
+        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.status_code = 200
+        return response
+    # access db using client id
+    data = request.get_json()
+    client_id = data["client_id"]
+    course = data["course"]
+    ap_courses = data["ap_courses"]
+    schedule = data["schedule"]
+    
+    # ap_courses is an array of the satisfactions
+    # schedule is a nested list of courses in each quarter
+    ret, satisfied_courses, satisfied_ge = prereq_check(schedule, ap_courses)
+    ret = major_check(ret, satisfied_courses)
+    ret = ge_check(ret, satisfied_ge)
+    ret.append([])
+    ret[19].append(course_links_ges[course]["Title"])
+    if course in prereq_info:
+        prereq_string = "[ "
+        for index, req_block in enumerate(prereq_info[course]): # right order?
+            prereq_string += prereq_info[course][index][0]
+            for local_index, course_req in enumerate(req_block):
+                if local_index == 0:
+                    continue
+                prereq_string += " or "
+                prereq_string += prereq_info[course][index][local_index]
+            if index < len(prereq_info[course]) - 1:
+                prereq_string += " ]  and  [ "
+        prereq_string += " ]"
+        ret[19].append(prereq_string)
+    else:
+        ret[19].append("None")
+    ret[19].append(course_links_ges[course]["Link"])
+    # what to do for these
+    print(ret)
+    return jsonify(ret) # could also include info to be displayed for newly added course
+
 @plan.after_request
 def middleware(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
