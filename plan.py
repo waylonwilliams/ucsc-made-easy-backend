@@ -70,6 +70,7 @@ def add():
         response = make_response()
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.status_code = 200
         return response
     # access db using client id
     data = request.get_json()
@@ -90,7 +91,18 @@ def add():
     ret.append([])
     ret[19].append(course_links_ges[course]["Title"])
     if course in prereq_info:
-        ret[19].append(prereq_info[course])
+        prereq_string = "[ "
+        for index, req_block in enumerate(prereq_info[course]): # right order?
+            prereq_string += prereq_info[course][index][0]
+            for local_index, course_req in enumerate(req_block):
+                if local_index == 0:
+                    continue
+                prereq_string += " or "
+                prereq_string += prereq_info[course][index][local_index]
+            if index < len(prereq_info[course]) - 1:
+                prereq_string += " ]  and  [ "
+        prereq_string += " ]"
+        ret[19].append(prereq_string)
     else:
         ret[19].append("None")
     ret[19].append(course_links_ges[course]["Link"])
@@ -104,6 +116,7 @@ def remove():
         response = make_response()
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.status_code = 200
         return response
     # access db using client id
     data = request.get_json()
@@ -149,6 +162,7 @@ def prereqadd():
         response = make_response()
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.status_code = 200
         return response
     # access db using client id
     data = request.get_json()
@@ -166,6 +180,7 @@ def prereqadd():
     ret, satisfied_courses, satisfied_ge = prereq_check(schedule, ap_courses)
     ret = major_check(ret, satisfied_courses)
     ret = ge_check(ret, satisfied_ge)
+    ret.append([course, "None", ""])
     # what to do for these
     print(ret)
     return jsonify(ret) # could also include info to be displayed for newly added course
@@ -177,6 +192,7 @@ def prereqremove():
         response = make_response()
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.status_code = 200
         return response
     # access db using client id
     data = request.get_json()
@@ -194,6 +210,7 @@ def prereqremove():
     ret, satisfied_courses, satisfied_ge = prereq_check(schedule, ap_courses)
     ret = major_check(ret, satisfied_courses)
     ret = ge_check(ret, satisfied_ge)
+    ret.append([course, "None", ""])
     print(ret)
     return jsonify(ret) # could also include info to be displayed for newly added course
 
