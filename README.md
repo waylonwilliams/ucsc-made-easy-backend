@@ -1,5 +1,9 @@
 [Link to the front end repo](https://github.com/nhi1e/ucsc-made-easy-frontend)
 
+
+https://github.com/waylonwilliams/ucsc-made-easy-backend/assets/145303505/b2c2b71f-a370-414c-ae8e-aafdf6458d74
+
+
 ## Motivation
 UCSC's provided course planning tools are unhelpful and leave many students without the knowledge needed for successful course planning. This app brings all necessary information into one place to make the process of course planning fast and intuitive for students unfamiliar with their requirements. 
 
