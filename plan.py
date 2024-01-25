@@ -19,49 +19,43 @@ def setup():
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         return response
+    
+    # when I change raw strings into good json, use values > 50
+    # they just need to not conflict with front end list, and backend only cares about label
+
     # check for client id
+    # front only fetches when client id is present
     data = request.get_json()
     client_id = data["client_id"]
     mycursor.execute("""
-        SELECT client_id, position, course
+        SELECT position, course
         FROM planner
         WHERE client_id = %s
         ORDER BY position""", (client_id,))
     temp_courses = mycursor.fetchall()
     # if it wasn't in db, add it
-    if temp_courses == []:   
-        mycursor.executemany("INSERT INTO planner (client_id, position, course) values (%s, %s, %s)", [(client_id, i, None) for i in range(48)])
-        mydb.commit()
-        mycursor.nextset()
-        return jsonify({"prev_vals": [], "prereq": [], "prev_aps": []}) # empty list will init the values to nothing
-    # if it was already in db, do nothing
-    else:
-        # init
-        setup = []
-        setup_aps = []
-        ap_courses = []
-        courses = [{1: None, 2: None, 3: None} for i in range(16)]
-        # get courses on screen and info for prereq check functions
-        for i in temp_courses:
-            if i[1] == -1: # skip ap classes, not sure what to do with these
-                ap_courses.append(i[2]) # this will at least get the values right, not the loading select tho
-                setup_aps.append({"title": i[2]})
-                continue
-            if i[2] != None:
-                setup.append({"value": int(course_links_ges[i[2]]["value"]), "label": i[2]})
-            else:
-                setup.append(None)
-            courses[i[1] // 3][i[1] % 3 + 1] = i[2]
-        # prereq check functions so colors are also updated on start
-        unsatisfied, satisfied, ap_ges, credits = prereq_check(courses, ap_courses)
-        major_satisfaction = major_check(satisfied)
-        ge_satisfaction = ge_check(ap_ges)
-        temp_return = [0 for i in range(48)]
-        for i in unsatisfied:
-            temp_return[unsatisfied[i][0]] = 1
-        temp_return += major_satisfaction + ge_satisfaction
-        temp_return.append(credits)
-        return jsonify({"prev_vals": setup, "prereq": temp_return, "prev_aps": setup_aps}) # jsonify will format it for me    
+    ap_courses = []
+    courses = [[] for i in range(16)]
+    for course in temp_courses:
+        if course[0] == -1: # should be position value
+            ap_courses.append(course[1]) # update to {"value": arbitrary_value, "label": course[1]} later
+        else:
+            courses[course[0]].append(course[1])
+    
+    # basic prereq checks
+    ret, satisfied_courses, satisfied_ge = prereq_check(courses, ap_courses)
+    ret = major_check(ret, satisfied_courses)
+    ret = ge_check(ret, satisfied_ge)
+    ret.append(["Course info here", "Info here", ""])
+
+    ap_courses_formatted = []
+    arbitrary_value = 100
+    for i in ap_courses:
+        ap_courses_formatted.append({"value": arbitrary_value, "label": i})
+        arbitrary_value += 1
+
+    return jsonify({"schedule": courses, "ap_courses": ap_courses_formatted, "prereq": ret})
+    # return list of courses, list of ap courses, and usual prereq data
 
 @plan.route("/add", methods = ["POST", "OPTIONS"])
 def add():
@@ -106,7 +100,6 @@ def add():
     else:
         ret[19].append("None")
     ret[19].append(course_links_ges[course]["Link"])
-    print(ret)
     return jsonify(ret) # could also include info to be displayed for newly added course
 
 @plan.route("/remove", methods = ["POST", "OPTIONS"])
@@ -152,7 +145,6 @@ def remove():
     else:
         ret[19].append("None")
     ret[19].append(course_links_ges[course]["Link"])
-    print(ret)
     return jsonify(ret) # could also include info to be displayed for newly added course
 
 @plan.route("/prereqadd", methods = ["POST", "OPTIONS"])
@@ -182,7 +174,6 @@ def prereqadd():
     ret = ge_check(ret, satisfied_ge)
     ret.append([course, "None", ""])
     # what to do for these
-    print(ret)
     return jsonify(ret) # could also include info to be displayed for newly added course
 
 @plan.route("/prereqremove", methods = ["POST", "OPTIONS"])
@@ -211,10 +202,9 @@ def prereqremove():
     ret = major_check(ret, satisfied_courses)
     ret = ge_check(ret, satisfied_ge)
     ret.append([course, "None", ""])
-    print(ret)
     return jsonify(ret) # could also include info to be displayed for newly added course
 
-@plan.route("getinfo", methods = ["POST", "OPTIONS"])
+@plan.route("/getinfo", methods = ["POST", "OPTIONS"])
 def getinfo():
     # handle OPTIONS cleanly
     if request.method == "OPTIONS":
@@ -225,11 +215,9 @@ def getinfo():
         return response
     # access db using client id
     data = request.get_json()
-    client_id = data["client_id"]
     course = data["course"]
     ap_courses = data["ap_courses"]
     schedule = data["schedule"]
-    
     # ap_courses is an array of the satisfactions
     # schedule is a nested list of courses in each quarter
     ret, satisfied_courses, satisfied_ge = prereq_check(schedule, ap_courses)
@@ -254,7 +242,6 @@ def getinfo():
         ret[19].append("None")
     ret[19].append(course_links_ges[course]["Link"])
     # what to do for these
-    print(ret)
     return jsonify(ret) # could also include info to be displayed for newly added course
 
 @plan.after_request
