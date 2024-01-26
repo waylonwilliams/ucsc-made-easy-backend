@@ -1,7 +1,7 @@
 [Link to the front end repo](https://github.com/nhi1e/ucsc-made-easy-frontend)
 
 
-https://github.com/waylonwilliams/ucsc-made-easy-backend/assets/145303505/b2c2b71f-a370-414c-ae8e-aafdf6458d74
+https://github.com/waylonwilliams/ucsc-made-easy-backend/assets/145303505/8d3b7c52-2688-4d69-af73-1961a857f5dd
 
 
 ## Motivation
