@@ -31,3 +31,6 @@ In a new terminal, navigate to the back-end repo and run
 ```
 flask run
 ```
+
+## What's next for UCSC Made Easy
+Refining the application to be good enough for serious use. More web scraping and ensuring that data is accurate, polishing the UI to be as smooth as possible, and hopefully getting in touch with the school to share this platform and help students.
