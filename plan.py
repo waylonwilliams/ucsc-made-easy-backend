@@ -1,12 +1,17 @@
-from flask import Blueprint, request, jsonify, session, make_response
+from flask import Blueprint, request, jsonify, make_response
 from info import *
 from functions import prereq_check, major_check, ge_check
 import mysql.connector
+import os
 mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="hahahddd%55^jjd9", # NHI UPDATE YOUR PASSWORD
-  database = "4y"
+    host = os.environ.get("database_url"),
+    user = os.environ.get("database_user"),
+    password = os.environ.get("database_pw"),
+    database = "courses"
+    # host = "localhost",
+    # user = "root",
+    # password = "hahahddd%55^jjd9",
+    # database = "4y"
 )
 mycursor = mydb.cursor(buffered=True)
 plan = Blueprint(__name__, "plan")
@@ -19,9 +24,6 @@ def setup():
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         return response
-    
-    # when I change raw strings into good json, use values > 50
-    # they just need to not conflict with front end list, and backend only cares about label
 
     # check for client id
     # front only fetches when client id is present
