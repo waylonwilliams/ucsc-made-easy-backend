@@ -41,7 +41,3 @@ In a new terminal, navigate to the back-end repo and run
 docker build -t course-planner .
 docker run -it -p 5000:8080 course-planner
 ```
-
-## What's next for UCSC Made Easy
-
-Refining the application to be good enough for serious use. More web scraping and ensuring that data is accurate, polishing the UI to be as smooth as possible, and hopefully getting in touch with the school to share this platform and help students.
