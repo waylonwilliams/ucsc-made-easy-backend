@@ -1,3 +1,5 @@
+# UCSC Made Easy
+
 [Link to the front end repo](https://github.com/nhi1e/ucsc-made-easy-frontend)
 
 https://github.com/waylonwilliams/ucsc-made-easy-backend/assets/145303505/8d3b7c52-2688-4d69-af73-1961a857f5dd
@@ -28,7 +30,7 @@ git clone https://github.com/waylonwilliams/ucsc-made-easy-backend.git
 git clone https://github.com/nhi1e/ucsc-made-easy-frontend.git
 ```
 
-Navigate to the front-end repo in one terminal and run
+In one terminal, navigate to the front-end repo and run
 
 ```
 npm i
