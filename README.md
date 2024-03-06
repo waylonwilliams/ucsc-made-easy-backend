@@ -43,3 +43,9 @@ In a new terminal, navigate to the back-end repo and run
 docker build -t course-planner .
 docker run -it -p 5000:8080 course-planner
 ```
+
+Or, if you don't have Docker
+```
+pip install -r requirements.txt
+flask run
+```
