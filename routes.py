@@ -3,6 +3,7 @@ from info import *
 from functions import prereq_check, major_check, ge_check
 import os
 from planner import db, Planner
+from sqlalchemy import text
 
 # import mysql.connector
 # mydb = mysql.connector.connect(
@@ -32,11 +33,11 @@ def setup():
     # front only fetches when client id is present
     data = request.get_json()
     client_id = data["client_id"]
-    rows = db.session.execute("""
+    rows = db.session.execute(text("""
         SELECT position, course
         FROM planner
-        WHERE client_id = %s
-        ORDER BY position""", (client_id,))
+        WHERE client_id = :client_id
+        ORDER BY position"""), {"client_id": client_id})
     temp_courses = rows.fetchall()
     # if it wasn't in db, add it
     ap_courses = []
@@ -78,8 +79,8 @@ def add():
     course = data["course"]
     ap_courses = data["ap_courses"]
     schedule = data["schedule"]
-    db.session.execute("""INSERT INTO planner (client_id, position, course)
-                    VALUES (%s, %s, %s)""", (client_id, slot, course,))
+    db.session.execute(text("""INSERT INTO planner (client_id, position, course)
+                    VALUES (:client_id , :slot , :course )"""), {"client_id": client_id, "slot" : slot, "course" : course})
     db.session.commit()
     
     # ap_courses is an array of the satisfactions
@@ -123,8 +124,8 @@ def remove():
     course = data["course"]
     ap_courses = data["ap_courses"]
     schedule = data["schedule"]
-    db.session.execute("""DELETE FROM planner
-                    WHERE client_id = %s AND position = %s AND course = %s""", (client_id, slot, course,))
+    db.session.execute(text("""DELETE FROM planner
+                    WHERE client_id = :client_id AND position = :slot AND course = :course"""), {"client_id": client_id, "slot" : slot, "course" : course})
     db.session.commit()
     
     # ap_courses is an array of the satisfactions
@@ -168,8 +169,8 @@ def prereqadd():
     course = data["course"]
     ap_courses = data["ap_courses"]
     schedule = data["schedule"]
-    db.session.execute("""INSERT INTO planner (client_id, position, course)
-                    VALUES (%s, %s, %s)""", (client_id, slot, course,))
+    db.session.execute(text("""INSERT INTO planner (client_id, position, course)
+                    VALUES (:client_id , :slot , :course )"""), {"client_id": client_id, "slot" : slot, "course" : course})
     db.session.commit()
     
     # ap_courses is an array of the satisfactions
@@ -197,8 +198,8 @@ def prereqremove():
     course = data["course"]
     ap_courses = data["ap_courses"]
     schedule = data["schedule"]
-    db.session.execute("""DELETE FROM planner
-                    WHERE client_id = %s AND position = %s AND course = %s""", (client_id, slot, course,))
+    db.session.execute(text("""DELETE FROM planner
+                    WHERE client_id = :client_id AND position = :slot AND course = :course"""), {"client_id": client_id, "slot" : slot, "course" : course})
     db.session.commit()
     
     # ap_courses is an array of the satisfactions
