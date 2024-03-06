@@ -1,22 +1,8 @@
 from flask import Blueprint, request, jsonify, make_response
 from info import *
 from functions import prereq_check, major_check, ge_check
-import os
 from planner import db, Planner
 from sqlalchemy import text
-
-# import mysql.connector
-# mydb = mysql.connector.connect(
-#     host = os.environ.get("database_url"),
-#     user = os.environ.get("database_user"),
-#     password = os.environ.get("database_pw"),
-#     database = "courses"
-#     # host = "localhost",
-#     # user = "root",
-#     # password = "hahahddd%55^jjd9",
-#     # database = "4y"
-# )
-# mycursor = mydb.cursor(buffered=True)
 
 bp = Blueprint(__name__, "plan")
 
