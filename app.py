@@ -1,14 +1,30 @@
 from flask import Flask
 from flask_cors import CORS
 from os import urandom
-from plan import plan
- 
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from planner import db
+from routes import bp
+
+
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}) # means every route
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # Allow CORS for localhost
 app.secret_key = urandom(24).hex()
 
-from plan import plan
-app.register_blueprint(plan, url_prefix="/")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///planner.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db.session.remove()
+
+app.register_blueprint(bp)
 
 if __name__ == "__main__":
     app.run(debug=True)

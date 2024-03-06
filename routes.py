@@ -1,22 +1,25 @@
 from flask import Blueprint, request, jsonify, make_response
 from info import *
 from functions import prereq_check, major_check, ge_check
-import mysql.connector
 import os
-mydb = mysql.connector.connect(
-    host = os.environ.get("database_url"),
-    user = os.environ.get("database_user"),
-    password = os.environ.get("database_pw"),
-    database = "courses"
-    # host = "localhost",
-    # user = "root",
-    # password = "hahahddd%55^jjd9",
-    # database = "4y"
-)
-mycursor = mydb.cursor(buffered=True)
-plan = Blueprint(__name__, "plan")
+from planner import db, Planner
 
-@plan.route("/", methods = ["POST", "OPTIONS"])
+# import mysql.connector
+# mydb = mysql.connector.connect(
+#     host = os.environ.get("database_url"),
+#     user = os.environ.get("database_user"),
+#     password = os.environ.get("database_pw"),
+#     database = "courses"
+#     # host = "localhost",
+#     # user = "root",
+#     # password = "hahahddd%55^jjd9",
+#     # database = "4y"
+# )
+# mycursor = mydb.cursor(buffered=True)
+
+bp = Blueprint(__name__, "plan")
+
+@bp.route("/", methods = ["POST", "OPTIONS"])
 def setup():
     # cleanly handle OPTIONS request
     if request.method == "OPTIONS":
@@ -29,12 +32,12 @@ def setup():
     # front only fetches when client id is present
     data = request.get_json()
     client_id = data["client_id"]
-    mycursor.execute("""
+    rows = db.session.execute("""
         SELECT position, course
         FROM planner
         WHERE client_id = %s
         ORDER BY position""", (client_id,))
-    temp_courses = mycursor.fetchall()
+    temp_courses = rows.fetchall()
     # if it wasn't in db, add it
     ap_courses = []
     courses = [[] for i in range(16)]
@@ -59,7 +62,7 @@ def setup():
     return jsonify({"schedule": courses, "ap_courses": ap_courses_formatted, "prereq": ret})
     # return list of courses, list of ap courses, and usual prereq data
 
-@plan.route("/add", methods = ["POST", "OPTIONS"])
+@bp.route("/add", methods = ["POST", "OPTIONS"])
 def add():
     # handle OPTIONS cleanly
     if request.method == "OPTIONS":
@@ -75,9 +78,9 @@ def add():
     course = data["course"]
     ap_courses = data["ap_courses"]
     schedule = data["schedule"]
-    mycursor.execute("""INSERT INTO planner (client_id, position, course)
-                     VALUES (%s, %s, %s)""", (client_id, slot, course,))
-    mydb.commit()
+    db.session.execute("""INSERT INTO planner (client_id, position, course)
+                    VALUES (%s, %s, %s)""", (client_id, slot, course,))
+    db.session.commit()
     
     # ap_courses is an array of the satisfactions
     # schedule is a nested list of courses in each quarter
@@ -104,7 +107,7 @@ def add():
     ret[19].append(course_links_ges[course]["Link"])
     return jsonify(ret) # could also include info to be displayed for newly added course
 
-@plan.route("/remove", methods = ["POST", "OPTIONS"])
+@bp.route("/remove", methods = ["POST", "OPTIONS"])
 def remove():
     # handle OPTIONS cleanly
     if request.method == "OPTIONS":
@@ -120,9 +123,9 @@ def remove():
     course = data["course"]
     ap_courses = data["ap_courses"]
     schedule = data["schedule"]
-    mycursor.execute("""DELETE FROM planner
-                     WHERE client_id = %s AND position = %s AND course = %s""", (client_id, slot, course,))
-    mydb.commit()
+    db.session.execute("""DELETE FROM planner
+                    WHERE client_id = %s AND position = %s AND course = %s""", (client_id, slot, course,))
+    db.session.commit()
     
     # ap_courses is an array of the satisfactions
     # schedule is a nested list of courses in each quarter
@@ -149,7 +152,7 @@ def remove():
     ret[19].append(course_links_ges[course]["Link"])
     return jsonify(ret) # could also include info to be displayed for newly added course
 
-@plan.route("/prereqadd", methods = ["POST", "OPTIONS"])
+@bp.route("/prereqadd", methods = ["POST", "OPTIONS"])
 def prereqadd():
     # handle OPTIONS cleanly
     if request.method == "OPTIONS":
@@ -165,9 +168,9 @@ def prereqadd():
     course = data["course"]
     ap_courses = data["ap_courses"]
     schedule = data["schedule"]
-    mycursor.execute("""INSERT INTO planner (client_id, position, course)
-                     VALUES (%s, %s, %s)""", (client_id, slot, course,))
-    mydb.commit()
+    db.session.execute("""INSERT INTO planner (client_id, position, course)
+                    VALUES (%s, %s, %s)""", (client_id, slot, course,))
+    db.session.commit()
     
     # ap_courses is an array of the satisfactions
     # schedule is a nested list of courses in each quarter
@@ -178,7 +181,7 @@ def prereqadd():
     # what to do for these
     return jsonify(ret) # could also include info to be displayed for newly added course
 
-@plan.route("/prereqremove", methods = ["POST", "OPTIONS"])
+@bp.route("/prereqremove", methods = ["POST", "OPTIONS"])
 def prereqremove():
     # handle OPTIONS cleanly
     if request.method == "OPTIONS":
@@ -194,9 +197,9 @@ def prereqremove():
     course = data["course"]
     ap_courses = data["ap_courses"]
     schedule = data["schedule"]
-    mycursor.execute("""DELETE FROM planner
-                     WHERE client_id = %s AND position = %s AND course = %s""", (client_id, slot, course,))
-    mydb.commit()
+    db.session.execute("""DELETE FROM planner
+                    WHERE client_id = %s AND position = %s AND course = %s""", (client_id, slot, course,))
+    db.session.commit()
     
     # ap_courses is an array of the satisfactions
     # schedule is a nested list of courses in each quarter
@@ -206,7 +209,7 @@ def prereqremove():
     ret.append([course, "None", ""])
     return jsonify(ret) # could also include info to be displayed for newly added course
 
-@plan.route("/getinfo", methods = ["POST", "OPTIONS"])
+@bp.route("/getinfo", methods = ["POST", "OPTIONS"])
 def getinfo():
     # handle OPTIONS cleanly
     if request.method == "OPTIONS":
@@ -246,7 +249,7 @@ def getinfo():
     # what to do for these
     return jsonify(ret) # could also include info to be displayed for newly added course
 
-@plan.after_request
+@bp.after_request
 def middleware(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
