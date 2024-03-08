@@ -1,4 +1,4 @@
-# [UCSC Made Easy](https://ucscmadeeasy.vercel.app/)
+# UCSC Made Easy
 
 [Link to the front end repo](https://github.com/nhi1e/ucsc-made-easy-frontend)
 
