@@ -8,3 +8,4 @@ class Planner(db.Model):
     client_id = db.Column(db.String(36), nullable=True)
     position = db.Column(db.Integer, nullable=True)
     course = db.Column(db.String(60), nullable=True)
+
