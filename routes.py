@@ -38,7 +38,7 @@ def setup():
     ret, satisfied_courses, satisfied_ge = prereq_check(courses, ap_courses)
     ret = major_check(ret, satisfied_courses)
     ret = ge_check(ret, satisfied_ge)
-    ret.append(["Course info here", "Info here", ""])
+    ret.append(["Course info here", [], ""])
 
     ap_courses_formatted = []
     arbitrary_value = 100
@@ -77,20 +77,29 @@ def add():
     ret.append([])
     ret[19].append(course_links_ges[course]["Title"])
     if course in prereq_info:
-        prereq_string = "[ "
+        prereq_array = []
+        i = -1
+        # prereq_string = "[ "
         for index, req_block in enumerate(prereq_info[course]): # right order?
-            prereq_string += prereq_info[course][index][0]
+            # prereq_string += prereq_info[course][index][0]
+            prereq_array.append([prereq_info[course][index][0]])
+            i += 1
             for local_index, course_req in enumerate(req_block):
                 if local_index == 0:
                     continue
-                prereq_string += " or "
-                prereq_string += prereq_info[course][index][local_index]
-            if index < len(prereq_info[course]) - 1:
-                prereq_string += " ]  and  [ "
-        prereq_string += " ]"
-        ret[19].append(prereq_string)
+                # prereq_string += " or "
+                prereq_array[i].append(prereq_info[course][index][local_index])
+                # prereq_string += prereq_info[course][index][local_index]
+        #     if index < len(prereq_info[course]) - 1:
+        #         prereq_string += " ]  and  [ "
+        # prereq_string += " ]"
+        # ret[19].append(prereq_string)
+        ret[19].append(prereq_array)
+        # print(prereq_string)
+        print(prereq_array)
     else:
-        ret[19].append("None")
+        # ret[19].append("None")
+        ret[19].append([])
     ret[19].append(course_links_ges[course]["Link"])
     return jsonify(ret) # could also include info to be displayed for newly added course
 
@@ -122,20 +131,29 @@ def remove():
     ret.append([])
     ret[19].append(course_links_ges[course]["Title"])
     if course in prereq_info:
-        prereq_string = "[ "
+        prereq_array = []
+        i = -1
+        # prereq_string = "[ "
         for index, req_block in enumerate(prereq_info[course]): # right order?
-            prereq_string += prereq_info[course][index][0]
+            # prereq_string += prereq_info[course][index][0]
+            prereq_array.append([prereq_info[course][index][0]])
+            i += 1
             for local_index, course_req in enumerate(req_block):
                 if local_index == 0:
                     continue
-                prereq_string += " or "
-                prereq_string += prereq_info[course][index][local_index]
-            if index < len(prereq_info[course]) - 1:
-                prereq_string += " ]  and  [ "
-        prereq_string += " ]"
-        ret[19].append(prereq_string)
+                # prereq_string += " or "
+                prereq_array[i].append(prereq_info[course][index][local_index])
+                # prereq_string += prereq_info[course][index][local_index]
+        #     if index < len(prereq_info[course]) - 1:
+        #         prereq_string += " ]  and  [ "
+        # prereq_string += " ]"
+        # ret[19].append(prereq_string)
+        ret[19].append(prereq_array)
+        # print(prereq_string)
+        print(prereq_array)
     else:
-        ret[19].append("None")
+        # ret[19].append("None")
+        ret[19].append([])
     ret[19].append(course_links_ges[course]["Link"])
     return jsonify(ret) # could also include info to be displayed for newly added course
 
@@ -164,7 +182,7 @@ def prereqadd():
     ret, satisfied_courses, satisfied_ge = prereq_check(schedule, ap_courses)
     ret = major_check(ret, satisfied_courses)
     ret = ge_check(ret, satisfied_ge)
-    ret.append([course, "None", ""])
+    ret.append([course, [], ""])
     # what to do for these
     return jsonify(ret) # could also include info to be displayed for newly added course
 
@@ -193,7 +211,7 @@ def prereqremove():
     ret, satisfied_courses, satisfied_ge = prereq_check(schedule, ap_courses)
     ret = major_check(ret, satisfied_courses)
     ret = ge_check(ret, satisfied_ge)
-    ret.append([course, "None", ""])
+    ret.append([course, [], ""])
     return jsonify(ret) # could also include info to be displayed for newly added course
 
 @bp.route("/getinfo", methods = ["POST", "OPTIONS"])
@@ -218,20 +236,29 @@ def getinfo():
     ret.append([])
     ret[19].append(course_links_ges[course]["Title"])
     if course in prereq_info:
-        prereq_string = "[ "
+        prereq_array = []
+        i = -1
+        # prereq_string = "[ "
         for index, req_block in enumerate(prereq_info[course]): # right order?
-            prereq_string += prereq_info[course][index][0]
+            # prereq_string += prereq_info[course][index][0]
+            prereq_array.append([prereq_info[course][index][0]])
+            i += 1
             for local_index, course_req in enumerate(req_block):
                 if local_index == 0:
                     continue
-                prereq_string += " or "
-                prereq_string += prereq_info[course][index][local_index]
-            if index < len(prereq_info[course]) - 1:
-                prereq_string += " ]  and  [ "
-        prereq_string += " ]"
-        ret[19].append(prereq_string)
+                # prereq_string += " or "
+                prereq_array[i].append(prereq_info[course][index][local_index])
+                # prereq_string += prereq_info[course][index][local_index]
+        #     if index < len(prereq_info[course]) - 1:
+        #         prereq_string += " ]  and  [ "
+        # prereq_string += " ]"
+        # ret[19].append(prereq_string)
+        ret[19].append(prereq_array)
+        # print(prereq_string)
+        print(prereq_array)
     else:
-        ret[19].append("None")
+        # ret[19].append("None")
+        ret[19].append([])
     ret[19].append(course_links_ges[course]["Link"])
     # what to do for these
     return jsonify(ret) # could also include info to be displayed for newly added course
