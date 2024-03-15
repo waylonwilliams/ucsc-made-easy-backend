@@ -95,7 +95,6 @@ def add():
         # prereq_string += " ]"
         # ret[19].append(prereq_string)
         ret[19].append(prereq_array)
-        # print(prereq_string)
         print(prereq_array)
     else:
         # ret[19].append("None")
