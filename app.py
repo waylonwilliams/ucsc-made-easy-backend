@@ -11,8 +11,8 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 app.secret_key = urandom(24).hex()
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{app.root_path}/data/planner.db"
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///planner.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{app.root_path}/data/planner.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///planner.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
