@@ -1,9 +1,4 @@
-# fly.toml app configuration file generated for ucsc-made-easy-backend-shy-wave-1904 on 2024-02-05T21:16:42-08:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
-app = 'ucsc-made-easy-backend-shy-wave-1904'
+app = 'ume'
 primary_region = 'sjc'
 
 [build]
