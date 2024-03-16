@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from os import urandom, getuid
+from os import urandom, path, getcwd
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, Column, Integer, String
 from planner import db
@@ -11,7 +11,8 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 app.secret_key = urandom(24).hex()
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{app.root_path}/data/planner.db"
+# file_path = path.abspath(getcwd())+"/database.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:////{app.root_path}/data/planner.db"
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///planner.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
