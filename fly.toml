@@ -18,4 +18,4 @@ primary_region = 'sjc'
 
 [mounts]
   source="umevolume"
-  destination="/data"
+  destination="/app/data"

@@ -1,19 +1,27 @@
 from flask import Flask
 from flask_cors import CORS
-from os import urandom, path, getcwd
+import os
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine, Column, Integer, String
 from planner import db
 from routes import bp
 
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
-app.secret_key = urandom(24).hex()
+app.secret_key = os.urandom(24).hex()
+
+if not os.path.exists("data"):
+    os.makedirs("data")
+file_path = os.path.join("data", "planner.db")
+if not os.path.exists( file_path ):
+    with open(file_path, 'w') as f:
+        pass
+
 
 # file_path = path.abspath(getcwd())+"/database.db"
-# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:////{app.root_path}/data/planner.db"
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///planner.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:////{app.root_path}/data/planner.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///data/planner.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///planner.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
