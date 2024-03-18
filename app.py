@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
 import os
-from flask_sqlalchemy import SQLAlchemy
 from planner import db
 from routes import bp
 
